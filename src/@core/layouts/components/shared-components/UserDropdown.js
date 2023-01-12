@@ -32,7 +32,7 @@ const BadgeContentSpan = styled('span')(({ theme }) => ({
   boxShadow: `0 0 0 2px ${theme.palette.background.paper}`
 }))
 
-const UserDropdown = () => {
+const UserDropdown = (props) => {
   // ** States
   const [anchorEl, setAnchorEl] = useState(null)
 
@@ -63,7 +63,6 @@ const UserDropdown = () => {
       color: 'text.secondary'
     }
   }
-
   return (
     <Fragment>
       <Badge

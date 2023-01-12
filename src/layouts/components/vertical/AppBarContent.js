@@ -16,7 +16,7 @@ import NotificationDropdown from 'src/@core/layouts/components/shared-components
 
 const AppBarContent = props => {
   // ** Props
-  const { hidden, settings, saveSettings, toggleNavVisibility } = props
+  const { hidden, settings, saveSettings, toggleNavVisibility, sessionData } = props
 
   // ** Hook
   const hiddenSm = useMediaQuery(theme => theme.breakpoints.down('sm'))
@@ -34,6 +34,7 @@ const AppBarContent = props => {
           </IconButton>
         ) : null}
         <TextField
+          placeholder='Search'
           size='small'
           sx={{ '& .MuiOutlinedInput-root': { borderRadius: 4 } }}
           InputProps={{
@@ -46,9 +47,9 @@ const AppBarContent = props => {
         />
       </Box>
       <Box className='actions-right' sx={{ display: 'flex', alignItems: 'center' }}>
-        <ModeToggler settings={settings} saveSettings={saveSettings} />
+        {/* <ModeToggler settings={settings} saveSettings={saveSettings} /> */}
         <NotificationDropdown />
-        <UserDropdown />
+        <UserDropdown sessionData={sessionData}/>
       </Box>
     </Box>
   )

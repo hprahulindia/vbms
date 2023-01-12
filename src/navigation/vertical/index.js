@@ -10,29 +10,50 @@ import AccountPlusOutline from 'mdi-material-ui/AccountPlusOutline'
 import AlertCircleOutline from 'mdi-material-ui/AlertCircleOutline'
 import GoogleCirclesExtended from 'mdi-material-ui/GoogleCirclesExtended'
 import AccountClockOutline from 'mdi-material-ui/AccountClockOutline'
+// ** Hook Import
+import { useSettings } from 'src/@core/hooks/useSettings'
 
-const navigation = () => {
-  return [
-    {
+const navigation = (props) => {
+  const { sessionData } = useSettings()
+  let navItem;
+  switch(sessionData?.role){
+    case 'admin': 
+    navItem = {
       title: 'Admin Dashboard',
       icon: HomeOutline,
       path: '/admin/dashboard'
-    },
-    {
+    };
+    break;
+    case 'doctor': 
+    navItem = {
       title: 'Doctor Dashboard',
       icon: HomeOutline,
       path: '/doctor/dashboard'
-    },
-    {
+    }
+    break;
+    case 'staff': 
+    navItem = {
       title: 'Staff Dashboard',
       icon: HomeOutline,
       path: '/staff/dashboard'
-    },
-    {
+    }
+    break;
+    case 'user': 
+    navItem = {
       title: 'User Dashboard',
       icon: HomeOutline,
       path: '/user/dashboard'
-    },
+    }
+    break;
+    default:
+      navItem = {
+        title: 'User Dashboard',
+        icon: HomeOutline,
+        path: '/user/dashboard'
+      }
+  }  
+  return [
+    navItem,
     {
       title: 'Account Settings',
       icon: AccountCogOutline,

@@ -17,7 +17,7 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 
 const UserLayout = ({ children }) => {
   // ** Hooks
-  const { settings, saveSettings } = useSettings()
+  const { settings, saveSettings, sessionData } = useSettings()
 
   /**
    *  The below variable will hide the current layout menu at given screen size.
@@ -32,6 +32,7 @@ const UserLayout = ({ children }) => {
   return (
     <VerticalLayout
       hidden={hidden}
+      sessionData={sessionData}
       settings={settings}
       saveSettings={saveSettings}
       verticalNavItems={VerticalNavItems()}
@@ -41,6 +42,7 @@ const UserLayout = ({ children }) => {
         <VerticalAppBarContent
           hidden={hidden}
           settings={settings}
+          sessionData={sessionData}
           saveSettings={saveSettings}
           toggleNavVisibility={props.toggleNavVisibility}
         />

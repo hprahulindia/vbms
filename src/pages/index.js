@@ -8,8 +8,6 @@ import { useRouter } from 'next/router'
 // ** MUI Components
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Divider from '@mui/material/Divider'
-import Checkbox from '@mui/material/Checkbox'
 import TextField from '@mui/material/TextField'
 import InputLabel from '@mui/material/InputLabel'
 import Typography from '@mui/material/Typography'
@@ -68,7 +66,7 @@ const LoginPage = () => {
   // ** Hook
   const theme = useTheme()
   const router = useRouter()
-  const { saveSettings } = useSettings()  
+  const { updateSessionsData, sessionData } = useSettings()  
 
   const handleChange = prop => event => {
     setValues({ ...values, [prop]: event.target.value })
@@ -83,14 +81,27 @@ const LoginPage = () => {
   }
 
   const handleSubmit = () => {
-    const url = `/${role}/dashboard/`
+    const url = `/${role}/dashboard/`;
+    updateSessionsData({profile:values, role:role});
+    getAppData();
     router.push(url)
   }
 
+  const getAppData = () => {
+    // axios.get(`http://3.236.24.43:8090/hospital`)  
+    // .then(res => {  
+    //   console.log('hospitals', res); 
+    // });
+    // axios.get(`http://3.236.24.43:8090/bed/beds`)  
+    // .then(res => {  
+    //   console.log('beds', res); 
+    // });
+  }
+
   const handleRoleChange = (e) => {
-    saveSettings(e.target.value);
     setRole(e.target.value);
   }
+
   return (
     <Box className='content-center'>
       <Card sx={{ zIndex: 1 }}>
@@ -174,7 +185,7 @@ const LoginPage = () => {
             </Typography>
           </Box>
           <form noValidate autoComplete='off' onSubmit={e => e.preventDefault()}>
-            <TextField autoFocus fullWidth id='email' label='Email' sx={{ marginBottom: 4 }} />
+            <TextField autoFocus fullWidth id='email' label='Username/Email' sx={{ marginBottom: 4 }} onChange={handleChange('username')}/>
             <FormControl fullWidth sx={{ marginBottom: 4 }}>
               <InputLabel htmlFor='auth-login-password'>Password</InputLabel>
               <OutlinedInput
