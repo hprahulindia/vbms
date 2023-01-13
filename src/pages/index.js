@@ -1,6 +1,6 @@
 // ** React Imports
-import { useState } from 'react'
-
+import { useState, useContext, useEffect } from 'react'
+import axios from 'axios'
 // ** Next Imports
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -36,8 +36,7 @@ import BlankLayout from 'src/@core/layouts/BlankLayout'
 import FooterIllustrationsV1 from 'src/views/pages/auth/FooterIllustration'
 
 // ** Hook Import
-import { useSettings } from 'src/@core/hooks/useSettings'
-
+import { useSettings, SettingsContext } from 'src/@core/hooks/useSettings'
 // ** Styled Components
 const Card = styled(MuiCard)(({ theme }) => ({
   [theme.breakpoints.up('sm')]: { width: '28rem' }
@@ -63,11 +62,21 @@ const LoginPage = () => {
     showPassword: false
   });
   const [role, setRole] = useState('');
+  const [hospitals, setHospitals] = useState({});
+  const [beds, setBeds] = useState({});
+  const [patients, setPatients] = useState({});
+  const [tasks, setTasks] = useState({});
   // ** Hook
   const theme = useTheme()
   const router = useRouter()
   const { updateSessionsData, sessionData } = useSettings()  
-
+  
+  useEffect(()=>{
+    getAppData();
+  }, []);
+  useEffect(()=>{
+    updateSessionsData({patients, hospitals, beds, tasks, role:role});
+  },[hospitals, beds, tasks])
   const handleChange = prop => event => {
     setValues({ ...values, [prop]: event.target.value })
   }
@@ -82,20 +91,51 @@ const LoginPage = () => {
 
   const handleSubmit = () => {
     const url = `/${role}/dashboard/`;
-    updateSessionsData({profile:values, role:role});
-    getAppData();
+    updateSessionsData({role:role});
     router.push(url)
   }
 
   const getAppData = () => {
-    // axios.get(`http://3.236.24.43:8090/hospital`)  
-    // .then(res => {  
-    //   console.log('hospitals', res); 
-    // });
-    // axios.get(`http://3.236.24.43:8090/bed/beds`)  
-    // .then(res => {  
-    //   console.log('beds', res); 
-    // });
+    axios.get(`http://3.236.24.43:8090/patient/patients`)  
+    .then(res => {
+      let data = {};
+      if(res.status === 200 && res?.data.length){
+        res?.data.map(item=>{
+          data[item.id] = item;
+        });  
+        setPatients(data);
+      }
+    });
+    axios.get(`http://3.236.24.43:8090/bed/beds`)  
+    .then(res => {
+      let data = {};
+      if(res.status === 200 && res?.data.length){
+        res?.data.map(item=>{
+          data[item.bedId] = item;
+        });  
+        setBeds(data);
+      }
+    });
+    axios.get(`http://3.236.24.43:8090/bed/hospital/beds`)  
+    .then(res => {
+      let data = {};
+      if(res.status === 200 && Object.keys(res?.data).length){
+        Object.keys(res?.data).map(key=>{
+          if(res?.data[key].beds.length){
+            data[key] = res?.data[key];
+          }
+        });  
+        setHospitals(data);
+      }
+    });
+    axios.get(`http://3.236.24.43:8090/manager/tasks`)  
+    .then(res => {  
+      setTasks(res?.data);
+    });
+    axios.get(`http://3.236.24.43:8090/booking/bookings`)  
+    .then(res => {  
+      updateSessionsData({bookings:res?.data});
+    });
   }
 
   const handleRoleChange = (e) => {

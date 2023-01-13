@@ -18,101 +18,85 @@ const navigation = (props) => {
   let navItem;
   switch(sessionData?.role){
     case 'admin': 
-    navItem = {
+    navItem = [{
       title: 'Admin Dashboard',
       icon: HomeOutline,
       path: '/admin/dashboard'
-    };
+    }, {
+      title: 'Booking Requests',
+      icon: HomeOutline,
+      path: '/manage/tasks'
+    }];
     break;
     case 'doctor': 
-    navItem = {
+    navItem = [{
       title: 'Doctor Dashboard',
       icon: HomeOutline,
       path: '/doctor/dashboard'
-    }
+    }]
     break;
-    case 'staff': 
-    navItem = {
-      title: 'Staff Dashboard',
+    case 'hospital': 
+    navItem = [{
+      title: 'Hospital Dashboard',
       icon: HomeOutline,
-      path: '/staff/dashboard'
-    }
-    break;
-    case 'user': 
-    navItem = {
-      title: 'User Dashboard',
-      icon: HomeOutline,
-      path: '/user/dashboard'
-    }
+      path: '/hospital/dashboard'
+    }]
     break;
     default:
-      navItem = {
-        title: 'User Dashboard',
+      navItem = [{
+        title: 'Hospital Dashboard',
         icon: HomeOutline,
-        path: '/user/dashboard'
-      }
+        path: '/hospital/dashboard'
+      }]
   }  
   return [
-    navItem,
+    ...navItem,
+    // {
+    //   title: 'Account Settings',
+    //   icon: AccountCogOutline,
+    //   path: '/account-settings'
+    // },
     {
-      title: 'Account Settings',
-      icon: AccountCogOutline,
-      path: '/account-settings'
+      sectionTitle: 'Hospital'
     },
     {
-      title: 'Bookings',
+      title: 'Available Beds',
+      icon: Login,
+      path: '/bed/list',
+      openInNewTab: false
+    },
+    {
+      title: 'Add Bed',
+      icon: Login,
+      path: '/bed/add',
+      openInNewTab: false
+    },
+    // {
+    //   title: 'Available Doctors',
+    //   icon: Login,
+    //   path: '/pages/doctor/list',
+    //   openInNewTab: false
+    // },
+    {
+      title: 'Add Doctor',
+      icon: AccountPlusOutline,
+      path: '/pages/doctor/add',
+      openInNewTab: false
+    },
+    {
+      title: 'Add Patient',
+      icon: AccountPlusOutline,
+      path: '/pages/patient/add',
+      openInNewTab: false
+    },
+    {
+      sectionTitle: 'Beds'
+    },
+    {
+      title: 'Book Bed',
       icon: AccountClockOutline,
       path: '/bed/booking'
-    },
-    // {
-    //   sectionTitle: 'Pages'
-    // },
-    // {
-    //   title: 'Login',
-    //   icon: Login,
-    //   path: '/pages/login',
-    //   openInNewTab: false
-    // },
-    // {
-    //   title: 'Register',
-    //   icon: AccountPlusOutline,
-    //   path: '/pages/register',
-    //   openInNewTab: false
-    // },
-    // {
-    //   title: 'Error',
-    //   icon: AlertCircleOutline,
-    //   path: '/pages/error',
-    //   openInNewTab: true
-    // },
-    // {
-    //   sectionTitle: 'User Interface'
-    // },
-    // {
-    //   title: 'Typography',
-    //   icon: FormatLetterCase,
-    //   path: '/typography'
-    // },
-    // {
-    //   title: 'Icons',
-    //   path: '/icons',
-    //   icon: GoogleCirclesExtended
-    // },
-    // {
-    //   title: 'Cards',
-    //   icon: CreditCardOutline,
-    //   path: '/cards'
-    // },
-    // {
-    //   title: 'Tables',
-    //   icon: Table,
-    //   path: '/tables'
-    // },
-    // {
-    //   icon: CubeOutline,
-    //   title: 'Form Layouts',
-    //   path: '/form-layouts'
-    // }
+    }
   ]
 }
 

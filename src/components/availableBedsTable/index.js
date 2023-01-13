@@ -10,40 +10,52 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TablePagination from '@mui/material/TablePagination'
-
-const columns = [
-  { id: 'bedId', label: 'Bed', minWidth: 100 },
-  {
-    id: 'hospitalId',
-    label: 'Hospital',
-  },
-  {
-    id: 'bedType',
-    label: 'Bed Type',
-  },
-  {
-    id: 'bedCharges',
-    label: 'Charges',
-  },
-  {
-    id: 'bedAvailability',
-    label: 'Bed Availability',
-    minWidth: 170,
-    align: 'right',
-  }
-]
+import { Box } from '@mui/system'
+import { InputAdornment, TextField } from '@mui/material'
+import { Magnify } from 'mdi-material-ui'
+import { useSettings } from "src/@core/hooks/useSettings";
 
 const bedsTable = () => {
+  const columns = [
+    { id: 'bedId', label: 'Bed', minWidth: 100 },
+    {
+      id: 'hospitalId',
+      label: 'Hospital',
+      getName:true
+    },
+    {
+      id: 'hospitalId',
+      label: 'City',
+      getName:true
+    },
+    {
+      id: 'bedType',
+      label: 'Bed Type',
+    },
+    {
+      id: 'bedCharges',
+      label: 'Charges',
+    },
+    {
+      id: 'bedAvailability',
+      label: 'Bed Availability',
+      minWidth: 170,
+      align: 'right',
+    }
+  ]
   // ** States
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [availableBeds, setAvailableBeds] = useState([]);
   const [beds, setBeds] = useState([]);
+  const { updateSessionsData, sessionData } = useSettings();
 
   useEffect(()=>{
     axios.get(`http://3.236.24.43:8090/bed/beds`)  
     .then(res => {
       const bedData = res?.data.filter((item)=>item.bedAvailability==='AVAILABLE');
       setBeds(bedData);
+      setAvailableBeds(bedData)
     });
   }, [])
 
@@ -57,8 +69,36 @@ const bedsTable = () => {
   }
 
   console.log('beds', beds);
+  const handleSearch = (e) =>{
+    const keyword = e.target.value.toLowerCase();
+    const beds = availableBeds.filter((item)=>{
+      const hospital = sessionData?.hospitals[item.hospitalId]?.hospital?.name.toLowerCase();
+
+      if(hospital?.includes(keyword)){
+        return true;
+      }else{
+        return false;
+      }
+    });
+    setBeds(beds)
+  }
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+      <Box sx={{ display:'flex', justifyContent:'flex-end', margin:'0 16px 0 16px'}}>
+      <TextField
+          onChange={handleSearch}
+          placeholder='Search'
+          size='small'
+          sx={{ '& .MuiOutlinedInput-root': { borderRadius: 4 } }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position='start'>
+                <Magnify fontSize='small' />
+              </InputAdornment>
+            )
+          }}
+        />
+      </Box>
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table stickyHeader aria-label='sticky table'>
           <TableHead>
@@ -76,7 +116,13 @@ const bedsTable = () => {
                 <TableRow hover role='checkbox' tabIndex={-1} key={row.id}>
                   {columns.map(column => {
                     const value = row[column.id]
-
+                    if(column.getName && column.id === 'hospitalId' && column.label !== 'City'){
+                      value = sessionData?.hospitals[value]?.hospital?.name
+                      value = value?value:'No Name Found'
+                    }else if(column.getName && column.id === 'hospitalId'){
+                      value = sessionData?.hospitals[value]?.hospital?.city
+                      value = value?value:'No Name Found'
+                    }
                     return (
                       <TableCell key={column.id} align={column.align}>
                         {column.format && typeof value === 'number' ? column.format(value) : value}

@@ -2,6 +2,7 @@
 import { forwardRef, useState, useContext, useEffect } from 'react'
 import axios from 'axios'
 // ** MUI Imports
+import Alert from '@mui/material/Alert' 
 import Card from '@mui/material/Card'
 import Grid from '@mui/material/Grid'
 import Button from '@mui/material/Button'
@@ -10,79 +11,59 @@ import MenuItem from '@mui/material/MenuItem'
 import TextField from '@mui/material/TextField'
 import CardHeader from '@mui/material/CardHeader'
 import InputLabel from '@mui/material/InputLabel'
-import IconButton from '@mui/material/IconButton'
-import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
 import CardActions from '@mui/material/CardActions'
 import FormControl from '@mui/material/FormControl'
-import OutlinedInput from '@mui/material/OutlinedInput'
-import InputAdornment from '@mui/material/InputAdornment'
 import Select from '@mui/material/Select'
-
-// ** Third Party Imports
-import DatePicker from 'react-datepicker'
-
-// ** Icons Imports
-import EyeOutline from 'mdi-material-ui/EyeOutline'
-import EyeOffOutline from 'mdi-material-ui/EyeOffOutline'
-
-const CustomInput = forwardRef((props, ref) => {
-  return <TextField fullWidth {...props} inputRef={ref} label='Birth Date' autoComplete='off' />
-})
+// ** Hook Import
+import { useSettings } from 'src/@core/hooks/useSettings'
 
 const BedBookingForm = () => {
   // ** States
-  const [language, setLanguage] = useState([])
-  const [date, setDate] = useState(null)
-
-  const [values, setValues] = useState({
-    password: '',
-    password2: '',
-    showPassword: false,
-    showPassword2: false
-  })
-
-  useEffect(()=>{
-    axios.get(`http://3.236.24.43:8090/hospital`)  
-      .then(res => {  
-        console.log('hospitals', res); 
-      });
-      axios.get(`http://3.236.24.43:8090/bed/beds`)  
-      .then(res => {  
-        console.log('beds', res); 
-      }); 
-  }, [])
-  // Handle Password
-  const handlePasswordChange = prop => event => {
-    setValues({ ...values, [prop]: event.target.value })
-  }
-
-  const handleClickShowPassword = () => {
-    setValues({ ...values, showPassword: !values.showPassword })
-  }
-
-  const handleMouseDownPassword = event => {
-    event.preventDefault()
-  }
-
-  // Handle Confirm Password
-  const handleConfirmChange = prop => event => {
-    setValues({ ...values, [prop]: event.target.value })
-  }
-
-  const handleClickShowConfirmPassword = () => {
-    setValues({ ...values, showPassword2: !values.showPassword2 })
-  }
-
-  const handleMouseDownConfirmPassword = event => {
-    event.preventDefault()
-  }
+  const [data, setData] = useState({});
+  const [beds, setBeds] = useState({});
+  const [doctors, setDoctors] = useState([]);
+  const { sessionData, updateSessionsData } = useSettings();  
 
   // Handle Select
-  const handleSelectChange = event => {
-    setLanguage(event.target.value)
+  const handleSelectChange = prop => event => {
+    const hospitalID = event.target.value;
+    if(prop === 'hospitalId'){
+      let bedsData={};
+      if(sessionData?.hospitals[hospitalID].beds.length){
+        sessionData?.hospitals[hospitalID].beds.map((item)=>{
+          if(item.bedAvailability==='AVAILABLE'){
+            bedsData[item.bedId] = item
+          }
+        });
+        setDoctors(sessionData?.hospitals[hospitalID].doctors);
+      }
+      // Object.keys(sessionData?.hospitals).map((key)=>{
+      //   if(parseInt(sessionData?.hospitals[key].hospitalId) === parseInt(hospitalID) && sessionData?.beds[key].bedAvailability==='AVAILABLE'){
+      //     bedsData[key] = sessionData?.beds[key];
+      //   }
+      // });
+      setBeds(bedsData);      
+    }
+    setData({ ...data, [prop]: hospitalID });
+  }
+  
+  const handleSubmit = () => {
+    axios.post('http://3.236.24.43:8090/bed/apply', data).then(function (response) {
+      console.log(response);
+      // setData({});
+      // setBeds({});
+    }).catch(function (error) {
+      // setData({});
+      // setBeds({});
+      console.log(error);
+    });
   }
 
+  console.log('data', data);
+  console.log('beds', beds);
+  console.log('sessionData', sessionData);
+  console.log(sessionData?.beds && Object.keys(sessionData?.beds).length);
   return (
     <Card>
       <CardHeader title='Bed Booking Form' titleTypographyProps={{ variant: 'h6' }} />
@@ -92,65 +73,64 @@ const BedBookingForm = () => {
           <Grid container spacing={5}>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
-                <InputLabel id='hospital-select-label'>Hospital</InputLabel>
+                <InputLabel id='hospitalId'>Hospital</InputLabel>
                 <Select
                   label='Hospital'
                   defaultValue=''
-                  id='hospital-select-label'
-                  labelId='hospital-select-label'
+                  id='hospitalId'
+                  labelId='hospitalId'
+                  onChange={handleSelectChange('hospitalId')}
                 >
-                  <MenuItem value='UK'>UK</MenuItem>
-                  <MenuItem value='USA'>USA</MenuItem>
-                  <MenuItem value='Australia'>Australia</MenuItem>
-                  <MenuItem value='Germany'>Germany</MenuItem>
+                  {sessionData?.hospitals && Object.keys(sessionData?.hospitals).length && Object.keys(sessionData?.hospitals).map(key=>{
+                    return <MenuItem value={key}>{sessionData?.hospitals[key]?.hospital?.name}-{key}</MenuItem>
+                  })}
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
-                <InputLabel id='bed-select-label'>Bed</InputLabel>
+                <InputLabel id='bedId'>Bed</InputLabel>
                 <Select
                   label='Bed'
                   defaultValue=''
-                  id='bed-select-label'
-                  labelId='bed-select-label'
+                  id='bedId'
+                  labelId='bedId'
+                  onChange={handleSelectChange('bedId')}
                 >
-                  <MenuItem value='UK'>UK</MenuItem>
-                  <MenuItem value='USA'>USA</MenuItem>
-                  <MenuItem value='Australia'>Australia</MenuItem>
-                  <MenuItem value='Germany'>Germany</MenuItem>
+                  {Object.keys(beds).length && Object.keys(beds).map(key=>{
+                    return <MenuItem value={key}>{sessionData?.beds[key]?.bedType}-{sessionData?.beds[key]?.bedAvailability}</MenuItem>
+                  })}
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
-                <InputLabel id='bed-select-label'>Patient Name</InputLabel>
+                <InputLabel id='patientId'>Patient Name</InputLabel>
                 <Select
                   label='Patient Name'
                   defaultValue=''
-                  id='patient-select-label'
-                  labelId='patient-select-label'
+                  id='patientId'
+                  labelId='patientId'
+                  onChange={handleSelectChange('patientId')}
                 >
-                  <MenuItem value='UK'>UK</MenuItem>
-                  <MenuItem value='USA'>USA</MenuItem>
-                  <MenuItem value='Australia'>Australia</MenuItem>
-                  <MenuItem value='Germany'>Germany</MenuItem>
+                  {sessionData?.patients && Object.keys(sessionData?.patients).length && Object.keys(sessionData?.patients).map(key=>{
+                    return <MenuItem value={key}>{sessionData?.patients[key]?.name}-{key}</MenuItem>
+                  })}
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
-                <InputLabel id='bed-select-label'>Doctor</InputLabel>
+                <InputLabel id='doctorId'>Doctor</InputLabel>
                 <Select
                   label='Doctor'
                   defaultValue=''
-                  id='doctor-select-label'
-                  labelId='doctor-select-label'
+                  id='doctorId'
+                  labelId='doctorId'
+                  onChange={handleSelectChange('doctorId')}
                 >
-                  <MenuItem value='UK'>UK</MenuItem>
-                  <MenuItem value='USA'>USA</MenuItem>
-                  <MenuItem value='Australia'>Australia</MenuItem>
-                  <MenuItem value='Germany'>Germany</MenuItem>
+                  <MenuItem value='6514'>Dr. Hiramath</MenuItem>
+                  <MenuItem value='6515'>Dr. Ketan</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -158,7 +138,7 @@ const BedBookingForm = () => {
         </CardContent>
         <Divider sx={{ margin: 0 }} />
         <CardActions>
-          <Button size='large' type='submit' sx={{ mr: 2 }} variant='contained'>
+          <Button size='large' type='submit' sx={{ mr: 2 }} variant='contained' onClick={handleSubmit}>
             Book
           </Button>
           <Button size='large' color='secondary' variant='outlined'>
@@ -166,6 +146,7 @@ const BedBookingForm = () => {
           </Button>
         </CardActions>
       </form>
+      {/* <Alert severity="success">Bed Booking Completed Successfully — check it out!</Alert> */}
     </Card>
   )
 }

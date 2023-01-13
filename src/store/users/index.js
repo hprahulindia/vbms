@@ -6,20 +6,15 @@ const users = () => {
       role: "admin",
     },
     {
+      username: "nitesh",
+      password: "nitesh",
+      role: "hospital",
+    },
+    {
       username: "kunal",
       password: "kunal",
       role: "doctor",
-    },
-    {
-      username: "nitesh",
-      password: "nitesh",
-      role: "staff",
-    },
-    {
-      username: "sam",
-      password: "sam",
-      role: "user",
-    },
+    }    
   ];
 };
 

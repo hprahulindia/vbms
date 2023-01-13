@@ -10,25 +10,34 @@ const initialSettings = {
   contentWidth: themeConfig.contentWidth
 }
 
+const initialSessionData = {
+  beds:{},
+  hospitals: {},
+  tasks:{},
+  doctors: {},
+  patients:{},
+  bookings: {}
+}
+
 // ** Create Context
 export const SettingsContext = createContext({
   saveSettings: () => null,
   settings: initialSettings,
   updateSessionsData: () => null,
-  sessionData:{}
+  sessionData:initialSessionData
 })
 
 export const SettingsProvider = ({ children }) => {
   // ** State
   const [settings, setSettings] = useState({ ...initialSettings })
-  const [sessionData, setSessionsData] = useState({})
+  const [sessionData, setSessionsData] = useState({...initialSessionData})
 
   const saveSettings = updatedSettings => {
     setSettings(updatedSettings)
   }
 
-  const updateSessionsData = (sessionData) => {
-    setSessionsData({...sessionData})
+  const updateSessionsData = (data) => {
+    setSessionsData({...sessionData, ...data})
   }
 
   return <SettingsContext.Provider value={{ settings, sessionData, saveSettings, updateSessionsData }}>{children}</SettingsContext.Provider>

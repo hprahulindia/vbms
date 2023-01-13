@@ -14,36 +14,51 @@ import CurrencyUsd from 'mdi-material-ui/CurrencyUsd'
 import DotsVertical from 'mdi-material-ui/DotsVertical'
 import CellphoneLink from 'mdi-material-ui/CellphoneLink'
 import AccountOutline from 'mdi-material-ui/AccountOutline'
-
-const salesData = [
-  {
-    stats: '245k',
+import { useEffect, useState } from 'react'
+import { useSettings } from 'src/@core/hooks/useSettings'
+const initData = {
+  bookings :{
+    stats: 0,
+    color: 'info',
+    title: 'Bookings',
+    icon: <CurrencyUsd sx={{ fontSize: '1.75rem' }} />
+  },
+  totalBeds : {
+    stats: 0,
     title: 'Total Beds',
     color: 'primary',
     icon: <TrendingUp sx={{ fontSize: '1.75rem' }} />
   },
-  {
-    stats: '12.5k',
+  availableBeds: {
+    stats: 0,
     title: 'Available Beds',
     color: 'success',
     icon: <AccountOutline sx={{ fontSize: '1.75rem' }} />
   },
-  {
-    stats: '1.54k',
+  allocatedBeds:{
+    stats: 0,
     color: 'warning',
-    title: 'Booked Beds',
+    title: 'Allocated Beds',
     icon: <CellphoneLink sx={{ fontSize: '1.75rem' }} />
-  },
-  {
-    stats: '$88k',
-    color: 'info',
-    title: 'Revenue',
-    icon: <CurrencyUsd sx={{ fontSize: '1.75rem' }} />
   }
-]
-
+}
 const renderStats = () => {
-  return salesData.map((item, index) => (
+  const [bedsData, setBedsData] = useState(initData);
+  const { sessionData } = useSettings(); 
+  useEffect(()=>{
+    let temp = bedsData;
+    const beds = sessionData.beds;
+    temp['bookings']['stats'] = sessionData?.bookings?.length;
+    temp['totalBeds']['stats'] = Object.keys(beds).length;
+    temp['availableBeds']['stats'] = Object.keys(beds).filter((key)=>{
+      return beds[key].bedAvailability ==='AVAILABLE'
+    }).length;
+    temp['allocatedBeds']['stats'] = Object.keys(beds).filter((key)=>{
+      return beds[key].bedAvailability ==='ALLOCATED'
+    }).length;
+    setBedsData({...temp});
+  }, [sessionData?.beds])
+  return Object.keys(bedsData).length && Object.keys(bedsData).map((item, index) => (
     <Grid item xs={12} sm={3} key={index}>
       <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
         <Avatar
@@ -54,14 +69,14 @@ const renderStats = () => {
             height: 44,
             boxShadow: 3,
             color: 'common.white',
-            backgroundColor: `${item.color}.main`
+            backgroundColor: `${bedsData[item].color}.main`
           }}
         >
-          {item.icon}
+          {bedsData[item].icon}
         </Avatar>
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-          <Typography variant='caption'>{item.title}</Typography>
-          <Typography variant='h6'>{item.stats}</Typography>
+          <Typography variant='caption'>{bedsData[item].title}</Typography>
+          <Typography variant='h6'>{bedsData[item].stats}</Typography>
         </Box>
       </Box>
     </Grid>
@@ -69,15 +84,11 @@ const renderStats = () => {
 }
 
 const BedStatisticsCard = () => {
+
   return (
     <Card>
       <CardHeader
         title='Bed Statistics'
-        action={
-          <IconButton size='small' aria-label='settings' className='card-more-options' sx={{ color: 'text.secondary' }}>
-            <DotsVertical />
-          </IconButton>
-        }
         titleTypographyProps={{
           sx: {
             mb: 2.5,

@@ -6,19 +6,19 @@ import Typography from '@mui/material/Typography'
 import CardHeader from '@mui/material/CardHeader'
 
 // ** Demo Components Imports
-import BookingTable from 'src/components/bookingTable'
+import TasksTable from 'src/components/tasksTable'
 
-const Bookings = () => {
+const BedList = () => {
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <Card>
-          <CardHeader title='Booking List' titleTypographyProps={{ variant: 'h6' }} />
-          <BookingTable />
+          <CardHeader title='Bed Booking Request List' titleTypographyProps={{ variant: 'h6' }} />
+          <TasksTable />
         </Card>
       </Grid>
     </Grid>
   )
 }
 
-export default Bookings
+export default BedList
