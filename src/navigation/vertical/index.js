@@ -80,13 +80,13 @@ const navigation = (props) => {
     {
       title: 'Add Doctor',
       icon: AccountPlusOutline,
-      path: '/pages/doctor/add',
+      path: '/doctor/add',
       openInNewTab: false
     },
     {
       title: 'Add Patient',
       icon: AccountPlusOutline,
-      path: '/pages/patient/add',
+      path: '/patient/add',
       openInNewTab: false
     },
     {

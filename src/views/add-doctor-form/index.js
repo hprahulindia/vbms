@@ -17,7 +17,7 @@ import Select from '@mui/material/Select'
 // ** Hook Import
 import { useSettings } from 'src/@core/hooks/useSettings'
 
-const AddBedForm = () => {
+const AddDoctorForm = () => {
   // ** States
   const [data, setData] = useState({});
   const [beds, setBeds] = useState({});
@@ -30,7 +30,6 @@ const AddBedForm = () => {
     if(prop === 'hospital'){
       let bedsData={};
       Object.keys(sessionData?.beds).map((key)=>{
-        debugger
         if(parseInt(sessionData?.beds[key].hospitalId) === parseInt(hospitalID)){
           bedsData[key] = sessionData?.beds[key];
         }
@@ -135,4 +134,4 @@ const AddBedForm = () => {
   )
 }
 
-export default AddBedForm
+export default AddDoctorForm

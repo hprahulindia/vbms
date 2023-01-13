@@ -1,6 +1,7 @@
 // ** React Imports
 import { forwardRef, useState, useContext, useEffect } from 'react'
 import axios from 'axios'
+import { useRouter } from 'next/router'
 // ** MUI Imports
 import Alert from '@mui/material/Alert' 
 import Card from '@mui/material/Card'
@@ -24,46 +25,37 @@ const BedBookingForm = () => {
   const [beds, setBeds] = useState({});
   const [doctors, setDoctors] = useState([]);
   const { sessionData, updateSessionsData } = useSettings();  
-
+  const router = useRouter()
   // Handle Select
   const handleSelectChange = prop => event => {
-    const hospitalID = event.target.value;
-    if(prop === 'hospitalId'){
-      let bedsData={};
-      if(sessionData?.hospitals[hospitalID].beds.length){
-        sessionData?.hospitals[hospitalID].beds.map((item)=>{
-          if(item.bedAvailability==='AVAILABLE'){
-            bedsData[item.bedId] = item
-          }
-        });
-        setDoctors(sessionData?.hospitals[hospitalID].doctors);
+    if(event?.target?.value){
+      const hospitalID = event.target.value;
+      if(prop === 'hospitalId'){
+        let bedsData={};
+        if(sessionData?.hospitals[hospitalID].beds.length){
+          sessionData?.hospitals[hospitalID].beds.map((item)=>{
+            if(item.bedAvailability==='AVAILABLE'){
+              bedsData[item.bedId] = item
+            }
+          });
+          setDoctors(sessionData?.hospitals[hospitalID].doctors);
+        }
+        setBeds(bedsData);      
       }
-      // Object.keys(sessionData?.hospitals).map((key)=>{
-      //   if(parseInt(sessionData?.hospitals[key].hospitalId) === parseInt(hospitalID) && sessionData?.beds[key].bedAvailability==='AVAILABLE'){
-      //     bedsData[key] = sessionData?.beds[key];
-      //   }
-      // });
-      setBeds(bedsData);      
+      setData({ ...data, [prop]: hospitalID });
     }
-    setData({ ...data, [prop]: hospitalID });
   }
   
   const handleSubmit = () => {
     axios.post('http://3.236.24.43:8090/bed/apply', data).then(function (response) {
       console.log(response);
-      // setData({});
-      // setBeds({});
+      const url = `/${sessionData?.role}/dashboard/`;
+      alert('Booking request added successfully!');
+      // router.push(url)
     }).catch(function (error) {
-      // setData({});
-      // setBeds({});
       console.log(error);
     });
   }
-
-  console.log('data', data);
-  console.log('beds', beds);
-  console.log('sessionData', sessionData);
-  console.log(sessionData?.beds && Object.keys(sessionData?.beds).length);
   return (
     <Card>
       <CardHeader title='Bed Booking Form' titleTypographyProps={{ variant: 'h6' }} />
@@ -128,9 +120,9 @@ const BedBookingForm = () => {
                   id='doctorId'
                   labelId='doctorId'
                   onChange={handleSelectChange('doctorId')}
-                >
-                  <MenuItem value='6514'>Dr. Hiramath</MenuItem>
-                  <MenuItem value='6515'>Dr. Ketan</MenuItem>
+                >{doctors.length && doctors.map((item)=>{
+                  return <MenuItem value={item.doctorId}>{item.doctorName}</MenuItem>
+                  })}
                 </Select>
               </FormControl>
             </Grid>
@@ -146,7 +138,6 @@ const BedBookingForm = () => {
           </Button>
         </CardActions>
       </form>
-      {/* <Alert severity="success">Bed Booking Completed Successfully — check it out!</Alert> */}
     </Card>
   )
 }

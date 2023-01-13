@@ -129,7 +129,7 @@ const TasksTable = () => {
                             value = sessionData?.beds[value]?.bedType
                           } else if(column.getName && column.id === 'bedId'){
                             value = sessionData?.beds[value]?.bedCharges
-                          }  
+                          } 
                         return (
                           <>
                           <TableCell key={column.id} align={column.align}>

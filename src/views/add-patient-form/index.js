@@ -17,7 +17,7 @@ import Select from '@mui/material/Select'
 // ** Hook Import
 import { useSettings } from 'src/@core/hooks/useSettings'
 
-const AddBedForm = () => {
+const AddPatientForm = () => {
   // ** States
   const [data, setData] = useState({});
   const [beds, setBeds] = useState({});
@@ -135,4 +135,4 @@ const AddBedForm = () => {
   )
 }
 
-export default AddBedForm
+export default AddPatientForm
